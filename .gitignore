@@ -1,0 +1,12 @@
+# PDF files (too large for git, obtain separately)
+*.pdf
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor files
+*.swp
+*.swo
+*~
