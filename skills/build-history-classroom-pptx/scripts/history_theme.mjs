@@ -7,27 +7,52 @@ export const SLIDE = Object.freeze({
   heightIn: 19.05 / CM_PER_INCH,
   marginX: 1.2 / CM_PER_INCH,
   topBarY: 0,
-  topBarH: 1.45 / CM_PER_INCH,
-  level2Y: 1.45 / CM_PER_INCH,
-  level2H: 1.4 / CM_PER_INCH,
-  level3Y: 2.85 / CM_PER_INCH,
-  level3H: 1.25 / CM_PER_INCH,
+  topBarH: 1.55 / CM_PER_INCH,
+  level2Y: 1.55 / CM_PER_INCH,
+  level2H: 1.35 / CM_PER_INCH,
+  level3Y: 2.9 / CM_PER_INCH,
+  level3H: 1.15 / CM_PER_INCH,
   contentY: 4.25 / CM_PER_INCH,
   contentBottom: 18.0 / CM_PER_INCH,
   footerY: 18.25 / CM_PER_INCH,
   footerH: 0.8 / CM_PER_INCH,
 });
 
-export const COLORS = Object.freeze({
-  primary: "1E869F",
-  deepBlue: "14525E",
-  lightBlue: "DCEFF2",
-  background: "F5FAFB",
-  white: "FFFFFF",
-  body: "111111",
-  conclusion: "ED7D31",
-  evidence: "FFC000",
+export const THEMES = Object.freeze({
+  dark: Object.freeze({
+    name: "dark",
+    background: "0A151C",
+    panel: "122832",
+    panelAlt: "173640",
+    primary: "1E869F",
+    cyan: "7BC1CC",
+    gold: "C69A4B",
+    text: "F4F7F6",
+    mutedText: "B9D0D2",
+    rule: "28505C",
+    conclusion: "ED7D31",
+    conclusionText: "FFFFFF",
+    evidence: "FFC000",
+  }),
+  light: Object.freeze({
+    name: "light",
+    background: "23899A",
+    panel: "FFFDFC",
+    panelAlt: "D8F0EF",
+    primary: "1E869F",
+    cyan: "7BC1CC",
+    gold: "C69A4B",
+    text: "15343A",
+    mutedText: "41646B",
+    rule: "A8D7D9",
+    conclusion: "ED7D31",
+    conclusionText: "FFFFFF",
+    evidence: "FFC000",
+  }),
 });
+
+// Backward-compatible alias. The Skill defaults to the dark written style specification.
+export const COLORS = THEMES.dark;
 
 export const FONTS = Object.freeze({
   title: "Microsoft YaHei",
@@ -52,6 +77,11 @@ export function cm(value) {
   return value / CM_PER_INCH;
 }
 
+export function resolveTheme(theme = "dark") {
+  if (typeof theme === "object" && theme) return theme;
+  return THEMES[theme] || THEMES.dark;
+}
+
 export function configureHistoryDeck(pptx, metadata = {}) {
   pptx.defineLayout({
     name: "HISTORY_CLASSROOM_WIDE",
@@ -73,38 +103,70 @@ export function addClassroomFrame(pptx, slide, options) {
     level2,
     level3 = "",
     courseName = "",
-    organization = "",
+    organization = "高中历史课堂",
+    theme = "dark",
   } = options;
 
+  if (!String(level1 || "").trim()) {
+    throw new Error(`Slide ${slideNumber}: level1 is required for a classroom content slide.`);
+  }
+  if (!String(level2 || "").trim()) {
+    throw new Error(`Slide ${slideNumber}: level2 is required for a classroom content slide.`);
+  }
+
+  const palette = resolveTheme(theme);
   const prefix = `S${String(slideNumber).padStart(2, "0")}`;
   const contentW = SLIDE.widthIn - 2 * SLIDE.marginX;
-  slide.background = { color: COLORS.background };
+  slide.background = { color: palette.background };
 
+  // A consistent top bar, gold marker, and stepped title path rebuild the
+  // Rebuild the written cloud-school visual language without a source template.
   slide.addShape(pptx.ShapeType.rect, {
     x: 0,
     y: SLIDE.topBarY,
     w: SLIDE.widthIn,
     h: SLIDE.topBarH,
-    fill: { color: COLORS.primary },
-    line: { color: COLORS.primary, transparency: 100 },
+    fill: { color: palette.panel },
+    line: { color: palette.panel, transparency: 100 },
     objectName: `${prefix}_TopBar`,
   });
-
+  slide.addShape(pptx.ShapeType.rect, {
+    x: 0,
+    y: 0,
+    w: cm(0.22),
+    h: SLIDE.topBarH,
+    fill: { color: palette.gold },
+    line: { color: palette.gold, transparency: 100 },
+    objectName: `${prefix}_GoldMarker`,
+  });
   slide.addText(level1, {
     x: SLIDE.marginX,
     y: SLIDE.topBarY,
-    w: contentW,
+    w: contentW - cm(4),
     h: SLIDE.topBarH,
     fontFace: FONTS.title,
     fontSize: FONT_SIZE.titleDefault,
     bold: true,
-    color: COLORS.white,
+    color: palette.text,
     margin: 0.05,
     valign: "mid",
     breakLine: false,
     objectName: `${prefix}_L1Title`,
   });
-
+  slide.addText(organization, {
+    x: SLIDE.widthIn - cm(5.2),
+    y: SLIDE.topBarY,
+    w: cm(4.0),
+    h: SLIDE.topBarH,
+    fontFace: FONTS.title,
+    fontSize: 18,
+    bold: true,
+    color: palette.cyan,
+    align: "right",
+    valign: "mid",
+    margin: 0.03,
+    objectName: `${prefix}_Brand`,
+  });
   slide.addText(level2, {
     x: SLIDE.marginX,
     y: SLIDE.level2Y,
@@ -113,13 +175,12 @@ export function addClassroomFrame(pptx, slide, options) {
     fontFace: FONTS.title,
     fontSize: FONT_SIZE.titleDefault,
     bold: true,
-    color: COLORS.primary,
+    color: palette.name === "dark" ? palette.cyan : palette.panel,
     margin: 0.04,
     valign: "mid",
     breakLine: false,
     objectName: `${prefix}_L2Title`,
   });
-
   slide.addText(level3, {
     x: SLIDE.marginX,
     y: SLIDE.level3Y,
@@ -128,19 +189,18 @@ export function addClassroomFrame(pptx, slide, options) {
     fontFace: FONTS.title,
     fontSize: FONT_SIZE.titleMinimum,
     bold: true,
-    color: COLORS.deepBlue,
+    color: palette.name === "dark" ? palette.text : palette.panel,
     margin: 0.04,
     valign: "mid",
     breakLine: false,
     objectName: `${prefix}_L3Title`,
   });
-
   slide.addShape(pptx.ShapeType.line, {
     x: SLIDE.marginX,
     y: cm(4.1),
     w: contentW,
     h: 0,
-    line: { color: COLORS.lightBlue, width: 1.25 },
+    line: { color: palette.gold, width: 1.5 },
     objectName: `${prefix}_HeaderRule`,
   });
 
@@ -149,11 +209,10 @@ export function addClassroomFrame(pptx, slide, options) {
     y: SLIDE.footerY,
     w: SLIDE.widthIn,
     h: SLIDE.footerH,
-    fill: { color: COLORS.primary },
-    line: { color: COLORS.primary, transparency: 100 },
+    fill: { color: palette.panel },
+    line: { color: palette.panel, transparency: 100 },
     objectName: `${prefix}_Footer`,
   });
-
   slide.addText(courseName, {
     x: SLIDE.marginX,
     y: SLIDE.footerY,
@@ -161,27 +220,12 @@ export function addClassroomFrame(pptx, slide, options) {
     h: SLIDE.footerH,
     fontFace: FONTS.title,
     fontSize: FONT_SIZE.metadata,
-    color: COLORS.white,
+    color: palette.mutedText,
     bold: true,
     margin: 0.03,
     valign: "mid",
     objectName: `${prefix}_FooterCourse`,
   });
-
-  slide.addText(organization, {
-    x: cm(20),
-    y: SLIDE.footerY,
-    w: cm(10),
-    h: SLIDE.footerH,
-    fontFace: FONTS.title,
-    fontSize: FONT_SIZE.metadata,
-    color: COLORS.white,
-    align: "right",
-    margin: 0.03,
-    valign: "mid",
-    objectName: `${prefix}_FooterOrg`,
-  });
-
   slide.addText(String(slideNumber), {
     x: cm(30.6),
     y: SLIDE.footerY,
@@ -189,7 +233,7 @@ export function addClassroomFrame(pptx, slide, options) {
     h: SLIDE.footerH,
     fontFace: FONTS.latin,
     fontSize: FONT_SIZE.metadata,
-    color: COLORS.white,
+    color: palette.cyan,
     bold: true,
     align: "right",
     margin: 0.03,
@@ -198,8 +242,68 @@ export function addClassroomFrame(pptx, slide, options) {
   });
 }
 
+export function addContentPanel(pptx, slide, options = {}) {
+  const {
+    x = SLIDE.marginX,
+    y = SLIDE.contentY,
+    w = SLIDE.widthIn - 2 * SLIDE.marginX,
+    h = SLIDE.contentBottom - SLIDE.contentY,
+    theme = "dark",
+    alt = false,
+    objectName = "ContentPanel",
+  } = options;
+  const palette = resolveTheme(theme);
+  slide.addShape(pptx.ShapeType.roundRect, {
+    x, y, w, h,
+    rectRadius: 0.06,
+    fill: { color: alt ? palette.panelAlt : palette.panel },
+    line: { color: palette.rule, width: 1 },
+    objectName,
+  });
+}
+
+export function addCurrentTask(pptx, slide, options) {
+  const {
+    slideNumber,
+    text,
+    x = SLIDE.marginX,
+    y = SLIDE.contentY,
+    w = SLIDE.widthIn - 2 * SLIDE.marginX,
+    h = cm(1.0),
+    theme = "dark",
+  } = options;
+  if (!String(text || "").trim()) {
+    throw new Error(`Slide ${slideNumber}: current task text is required.`);
+  }
+  const palette = resolveTheme(theme);
+  const prefix = `S${String(slideNumber).padStart(2, "0")}`;
+  slide.addShape(pptx.ShapeType.rect, {
+    x,
+    y,
+    w: cm(0.16),
+    h,
+    fill: { color: palette.gold },
+    line: { color: palette.gold, transparency: 100 },
+    objectName: `${prefix}_CurrentTaskMarker`,
+  });
+  slide.addText(text, {
+    x: x + cm(0.32),
+    y,
+    w: w - cm(0.32),
+    h,
+    fontFace: FONTS.title,
+    fontSize: FONT_SIZE.titleMinimum,
+    bold: true,
+    color: palette.text,
+    margin: 0.03,
+    valign: "mid",
+    objectName: `${prefix}_CurrentTask`,
+  });
+}
+
 export function addConclusionBar(pptx, slide, options) {
-  const { slideNumber, text, yCm = 16.3, hCm = 1.7 } = options;
+  const { slideNumber, text, yCm = 16.3, hCm = 1.7, theme = "dark" } = options;
+  const palette = resolveTheme(theme);
   const prefix = `S${String(slideNumber).padStart(2, "0")}`;
   slide.addText(text, {
     x: SLIDE.marginX,
@@ -207,12 +311,12 @@ export function addConclusionBar(pptx, slide, options) {
     w: SLIDE.widthIn - 2 * SLIDE.marginX,
     h: cm(hCm),
     shape: pptx.ShapeType.rect,
-    fill: { color: COLORS.conclusion },
-    line: { color: COLORS.conclusion, transparency: 100 },
+    fill: { color: palette.conclusion },
+    line: { color: palette.conclusion, transparency: 100 },
     fontFace: FONTS.title,
     fontSize: FONT_SIZE.conclusionDefault,
     bold: true,
-    color: COLORS.white,
+    color: palette.conclusionText,
     align: "center",
     valign: "mid",
     margin: 0.08,
@@ -232,7 +336,9 @@ export function addMediaPlaceholder(pptx, slide, options) {
     description,
     focus = "",
     ratio = "按占位区域",
+    theme = "dark",
   } = options;
+  const palette = resolveTheme(theme);
   const prefix = `S${String(slideNumber).padStart(2, "0")}`;
   const mediaId = `MEDIA-P${String(slideNumber).padStart(2, "0")}-${String(index).padStart(2, "0")}`;
   const lines = [
@@ -244,17 +350,14 @@ export function addMediaPlaceholder(pptx, slide, options) {
   lines.push("教师交付后手动替换");
 
   slide.addText(lines.join("\n"), {
-    x,
-    y,
-    w,
-    h,
+    x, y, w, h,
     shape: pptx.ShapeType.rect,
-    fill: { color: COLORS.lightBlue, transparency: 18 },
-    line: { color: COLORS.primary, width: 2 },
+    fill: { color: palette.panelAlt, transparency: 4 },
+    line: { color: palette.gold, width: 2 },
     fontFace: FONTS.body,
     fontSize: FONT_SIZE.bodyMinimum,
     bold: true,
-    color: COLORS.deepBlue,
+    color: palette.text,
     align: "center",
     valign: "mid",
     margin: 0.16,
