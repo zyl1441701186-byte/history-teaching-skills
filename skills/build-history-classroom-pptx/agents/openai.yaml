@@ -1,5 +1,5 @@
 interface:
   display_name: "高中历史课堂课件制作"
-  short_description: "默认深色云校风格，生成标题完整、视觉证据充分且同页揭示答案的历史课堂PPTX"
+  short_description: "优先调用本地私有模板，生成标题完整、视觉证据充分且同页揭示答案的历史课堂PPTX"
   brand_color: "#1E869F"
-  default_prompt: "Use $build-history-classroom-pptx to create a native high-school history PPTX with the dark cloud-school visual language unless I request light. Preserve separate L1/L2/L3 titles, include the two-version curriculum-standard pages, plan sufficient visual evidence, reveal table answers on the same slide, use meaningful diagram grammar, and complete audience-view, animation, overflow, residue, and style QA."
+  default_prompt: "Use $build-history-classroom-pptx to create a native high-school history PPTX. Unless I request light, prefer the local private dark cloud-school template when present and fall back to the written dark visual specification when absent. Preserve separate L1/L2/L3 titles, include the two-version curriculum-standard pages, plan sufficient visual evidence, reveal table answers on the same slide, use meaningful diagram grammar, never add a bottom-left note prompt or any page number, and complete audience-view, animation, overflow, residue, and style QA."

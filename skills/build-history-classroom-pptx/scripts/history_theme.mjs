@@ -115,6 +115,9 @@ export function addClassroomFrame(pptx, slide, options) {
   }
 
   const palette = resolveTheme(theme);
+  if (/^\s*笔记\s*$/.test(String(courseName || ""))) {
+    throw new Error("The lower-left footer label '笔记' is prohibited.");
+  }
   const prefix = `S${String(slideNumber).padStart(2, "0")}`;
   const contentW = SLIDE.widthIn - 2 * SLIDE.marginX;
   slide.background = { color: palette.background };
@@ -225,20 +228,6 @@ export function addClassroomFrame(pptx, slide, options) {
     margin: 0.03,
     valign: "mid",
     objectName: `${prefix}_FooterCourse`,
-  });
-  slide.addText(String(slideNumber), {
-    x: cm(30.6),
-    y: SLIDE.footerY,
-    w: cm(2.0),
-    h: SLIDE.footerH,
-    fontFace: FONTS.latin,
-    fontSize: FONT_SIZE.metadata,
-    color: palette.cyan,
-    bold: true,
-    align: "right",
-    margin: 0.03,
-    valign: "mid",
-    objectName: `${prefix}_PageNumber`,
   });
 }
 
