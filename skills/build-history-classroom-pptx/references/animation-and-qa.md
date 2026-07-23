@@ -69,7 +69,6 @@
 - 抽查单击顺序与教师备注；
 - 再次运行文字溢出检查。
 - 运行 `Test-HistoryClassroomStructure.ps1`；
-- 按实际交付状态运行 `Test-HistoryClassroomReadiness.ps1`；
 - 核对所有页面均无右下角页码、当前页/总页数及其他页码变体；
 - 抽查互动表格答案对象与时间轴数量；
 - 检查相邻页面标准化文本，识别空白页/答案页重复。
