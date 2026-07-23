@@ -20,6 +20,7 @@ description: 基于已确认的高中历史资料核心摘要和教学主线，�
 执行前完整读取：
 
 - [references/lesson-design-rules.md](references/lesson-design-rules.md)
+- [references/workspace-contract.md](references/workspace-contract.md)
 - [references/media-intent-and-confirmation.md](references/media-intent-and-confirmation.md)
 - [references/slide-interface-contract.md](references/slide-interface-contract.md)
 - [references/output-template.md](references/output-template.md)
@@ -27,6 +28,8 @@ description: 基于已确认的高中历史资料核心摘要和教学主线，�
 交付前完整读取并执行 [references/qa-checklist.md](references/qa-checklist.md)。
 
 # 启动条件
+
+`资料核心摘要.md` 必须位于由资料筛选阶段创建的 `yyyyMMdd-HHmmss_Trae_课标题` 任务目录中，同目录必须存在 `工作区信息.md`。读取其中的课标题、原始资料根目录和工作区根目录；本阶段全部新文件和临时文件只能写入该工作区。
 
 必须读取并确认 `资料核心摘要.md` 至少包含：
 
@@ -197,7 +200,7 @@ description: 基于已确认的高中历史资料核心摘要和教学主线，�
 
 ## 14. 输出与停止
 
-严格按输出模板生成三个文件，执行质量检查后停止。不得联网、选图或制作课件。
+严格按输出模板在同一任务目录根部生成三个文件，临时检查材料写入 `工作文件/`，并更新 `工作区信息.md` 当前阶段。执行质量检查后停止。不得联网、选图、制作课件或在任务目录外输出。
 
 # 关键失败处理
 

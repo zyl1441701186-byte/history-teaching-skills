@@ -84,6 +84,7 @@ try {
             empty_square = '\u25A1'
             bracket_placeholder = '\uFF08\s*\uFF09|\(\s*\)'
             underline_placeholder = '_{3,}|\uFF3F{3,}'
+            note_prompt = '^\s*\u7B14\u8BB0\s*$'
         }
         $residues = @()
         foreach ($pair in $residuePatterns.GetEnumerator()) {
@@ -93,15 +94,22 @@ try {
             }
         }
 
-        $pageNumberErrors = @()
+        $forbiddenFooterElements = @()
+        if (@($names | Where-Object { $_ -match '(?i)Page(Number|No)|Footer(Page|Note)|NotePrompt' }).Count -gt 0) {
+            $message = "Slide $slideNumber contains a forbidden footer note or page-number object"
+            $forbiddenFooterElements += $message
+            $errors += $message
+        }
         foreach ($run in $textRuns) {
+            if ($run -match '^\s*\u7B14\u8BB0\s*$') {
+                $message = "Slide $slideNumber contains the forbidden lower-left note prompt"
+                $forbiddenFooterElements += $message
+                $errors += $message
+            }
             if ($run -match '^\s*(\d+)\s*/\s*(\d+)\s*$') {
-                $shownTotal = [int]$Matches[2]
-                if ($shownTotal -ne $slideCount) {
-                    $message = "Slide $slideNumber page denominator $shownTotal does not equal actual slide count $slideCount"
-                    $pageNumberErrors += $message
-                    $errors += $message
-                }
+                $message = "Slide $slideNumber contains a forbidden visible page number: $run"
+                $forbiddenFooterElements += $message
+                $errors += $message
             }
         }
 
@@ -138,7 +146,7 @@ try {
             media_objects = $mediaObjects
             has_timing = $xml.SelectNodes('//p:timing', $ns).Count -gt 0
             residues = $residues
-            page_number_errors = $pageNumberErrors
+            forbidden_footer_elements = $forbiddenFooterElements
             previous_slide_similarity = $similarity
         }
         $previous = [pscustomobject]@{ Slide = $slideNumber; Grams = $grams }

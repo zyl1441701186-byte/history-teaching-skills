@@ -1,6 +1,9 @@
 # PDF files (too large for git, obtain separately)
 *.pdf
 
+# School-owned templates and other private runtime assets.
+skills/build-history-classroom-pptx/private-assets/
+
 # OS files
 .DS_Store
 Thumbs.db
