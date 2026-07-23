@@ -80,7 +80,7 @@ try {
 
         $residuePatterns = [ordered]@{
             ai_marker = 'AI\s*\u751F\u6210|AI\s*Generated'
-            production_note = '\u7248\u5F0F\u7528\u9014|\u5236\u4F5C\u63D0\u793A|\u5185\u90E8\u68C0\u67E5|\u5EFA\u8BAE\u7528\u65F6|\u5FC5\u8BB2\u9875|\u53EF\u538B\u7F29\u9875'
+            production_note = '\u7248\u5F0F\u7528\u9014|\u5236\u4F5C\u63D0\u793A|\u5185\u90E8\u68C0\u67E5|\u5EFA\u8BAE\u7528\u65F6|\u5FC5\u8BB2\u9875|\u53EF\u538B\u7F29\u9875|\u6559\u5E08\u5907\u8BFE\u9875|\u53EF\u9690\u85CF|AI\s*\u8BBE\u8BA1'
             empty_square = '\u25A1'
             bracket_placeholder = '\uFF08\s*\uFF09|\(\s*\)'
             underline_placeholder = '_{3,}|\uFF3F{3,}'
